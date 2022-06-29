@@ -63,6 +63,14 @@ public class SchoolServiceTest {
     }
 
     @Test
+    public void School과Student조회() throws Exception {
+        School school = schoolRepository.findById(1L).get();
+        Student student = studentRepository.findById(1L).get();
+        System.out.println(school.getName());
+        System.out.println(student.getName());
+    }
+
+    @Test
     public void School로부터Student조회() throws Exception {
         School school = schoolRepository.findById(1L).get();
 
