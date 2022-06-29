@@ -143,4 +143,21 @@ public class SchoolServiceTest {
         studentRepository.save(student);
 
     }
+
+    @Test
+    public void n더하기1예제() throws Exception {
+
+        System.out.println("== start ==");
+        List<School> schoolList = schoolRepository.findAll();
+        System.out.println("== find all ==");
+        for(School school: schoolList){
+            System.out.println(school.getStudents().get(0).getName());
+        }
+        //@Transactional이 붙은 테스트 코드에서는 N+1이 발생하지 않는다..?
+        //안가져왔따는건 1차캐시에서 가져왔다는건데...
+        //1차캐시에 들어갈만한 사건이 있었나? 조회, 저장 할 때 들어갈텐데..
+        //그리고 EAGER로 했는데 왜 school만 검색하나?
+        //이것도 @Transactional 때문인가?
+
+    }
 }
