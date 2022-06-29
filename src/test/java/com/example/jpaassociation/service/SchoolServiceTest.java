@@ -36,11 +36,11 @@ public class SchoolServiceTest {
     @Autowired
     private EntityManager em;
 
-   /* @After
+    @After
     public void cleanAll() {
         schoolRepository.deleteAll();
         studentRepository.deleteAll();
-    }*/
+    }
     @Before
     public void setup() {
         List<School> schools = new ArrayList<>();

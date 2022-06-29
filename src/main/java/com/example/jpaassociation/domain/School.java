@@ -23,7 +23,7 @@ public class School {
 
     private String name;
 
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "school", cascade = CascadeType.ALL)
     private List<Student> students = new ArrayList<>();
 
     public School(String name) {
