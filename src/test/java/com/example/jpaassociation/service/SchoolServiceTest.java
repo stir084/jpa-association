@@ -1,38 +1,46 @@
 package com.example.jpaassociation.service;
 
-import com.example.jpaassociation.domain.School;
-import com.example.jpaassociation.domain.SchoolRepository;
-import com.example.jpaassociation.domain.Student;
-import com.example.jpaassociation.domain.StudentRepository;
+import com.example.jpaassociation.domain.*;
 import org.hibernate.TransientPropertyValueException;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.Commit;
+import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import javax.persistence.EntityManager;
 import javax.security.auth.Subject;
-import javax.transaction.Transactional;
+//import javax.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import java.awt.print.Book;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
-@Transactional
 public class SchoolServiceTest {
     @Autowired
     private SchoolRepository schoolRepository;
 
     @Autowired
     private StudentRepository studentRepository;
+
+    @Autowired
+    private SchoolService schoolService;
+
+    @Autowired
+    private StudentService studentService;
+
     @Autowired
     private EntityManager em;
 
@@ -45,7 +53,7 @@ public class SchoolServiceTest {
     public void setup() {
         List<School> schools = new ArrayList<>();
 
-        for(int i=0; i<5; i++){
+        for(int i=1; i<=5; i++){
             School school = new School("school"+i);
 
             school.addStudent(new Student("Lee"+i));
@@ -145,19 +153,58 @@ public class SchoolServiceTest {
     }
 
     @Test
-    public void n더하기1예제() throws Exception {
-
+    @DisplayName("N+1 예제 - 1")
+    public void test1() throws Exception {
         System.out.println("== start ==");
-        List<School> schoolList = schoolRepository.findAll();
+        List<Student> studentList = studentRepository.findAll();
+        System.out.println(studentList.get(0).getSchool().getName());
+        System.out.println("== end ==");
+    }
+
+    @Test
+    @Transactional
+    @DisplayName("N+1 예제 - 2")
+    public void test2() throws Exception {
+        System.out.println("== start ==");
+        List<Student> studentList = studentRepository.findAll();
+        System.out.println(studentList.get(0).getSchool().getName());
+        System.out.println("== end ==");
+    }
+
+
+    //----------------LAZY 시작----------------//
+
+    @Test
+    @DisplayName("N+1 예제 - 3")
+    public void test3() throws Exception {
+        System.out.println("== start ==");
+        System.out.println(em.getDelegate());
+        studentService.findAllSchoolNames();
+        System.out.println("== end ==");
+    }
+
+    private List<String> getSchoolName(List<Student> students){
+        return students.stream()
+                .map(a -> a.getSchool().getName())
+                .collect(Collectors.toList());
+    }
+    @Test
+    @Transactional(readOnly = true)
+    public void n더하기1예제4() throws Exception {
+        //왜 예제3은 N+1이 발생하는데 테스트코드에선 발생하지 않는가?
+        System.out.println("== start ==");
+        List<School> academies = schoolRepository.findAll();
+
+        academies.stream()
+                .map(a -> a.getStudents().get(0).getName())
+                .collect(Collectors.toList());
         System.out.println("== find all ==");
+    }
+
+
+    public void test(List<School> schoolList) {
         for(School school: schoolList){
             System.out.println(school.getStudents().get(0).getName());
         }
-        //@Transactional이 붙은 테스트 코드에서는 N+1이 발생하지 않는다..?
-        //안가져왔따는건 1차캐시에서 가져왔다는건데...
-        //1차캐시에 들어갈만한 사건이 있었나? 조회, 저장 할 때 들어갈텐데..
-        //그리고 EAGER로 했는데 왜 school만 검색하나?
-        //이것도 @Transactional 때문인가?
-
     }
 }
