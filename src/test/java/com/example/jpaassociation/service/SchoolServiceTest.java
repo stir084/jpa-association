@@ -108,8 +108,10 @@ public class SchoolServiceTest {
         schoolRepository.save(school);
         //TransientPropertyValueException(임시 프로퍼티 값 예외 발생)
         //Student 객체 저장 시 객체 안에 저장되지 않은 객체(Student 내 School 객체)가 저장되려고 할 때 발생한다.
+        //따로따로 save해주거나 Entity에 cascade = CascadeType.ALL를 추가해서 한꺼번에 저장하는 방식으로 예외를 없앨 수 있다.
     }
     @Test
+    @Transactional
     public void ConstraintViolationException발생() throws Exception {
 
         School school = new School();
